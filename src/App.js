@@ -43,9 +43,20 @@ export default function App() {
 }
 
 const Example = () => {
-  const [page, setPage] = useState(3);
+  const [country, setCountry] = useState("fr");
+  const [page, setPage] = useState(1);
+  const app_id = "8028b95d";
+  const app_key = "e55f767e4b51e106e03219958f6ef82d";
+
   const { isLoading, error, data } = useQuery(
-    ["repoData", { page: page }],
+    [
+      "repoData",
+      {
+        country: country,
+        page: page,
+        params: { app_id: app_id, app_key: app_key },
+      },
+    ],
     ({ queryKey }) => fetchJobs(queryKey[1]),
     {
       staleTime: 300000,

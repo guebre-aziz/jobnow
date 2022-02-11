@@ -1,5 +1,5 @@
 import axios from "axios";
 
 export default axios.create({
-  baseURL: "https://www.themuse.com/api/public",
+  baseURL: "https://api.adzuna.com/v1/api/",
 });

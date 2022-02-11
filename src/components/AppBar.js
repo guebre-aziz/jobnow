@@ -187,7 +187,7 @@ export default function ResponsiveAppBar() {
           </Box>
         </Toolbar>
       </Container>
-      <Divider />
+      {/* <Divider /> */}
     </AppBar>
   );
 }

@@ -6,250 +6,588 @@ import {
   Typography,
   Input,
   InputBase,
+  Box,
+  Divider,
+  TextField,
+  InputAdornment,
+  MenuItem,
+  Paper,
+  Slider,
+  Pagination,
 } from "@mui/material";
-import TextField from "@mui/material/TextField";
-import Stack from "@mui/material/Stack";
-import Autocomplete from "@mui/material/Autocomplete";
-import SearchIcon from "@mui/icons-material/Search";
-import { styled, alpha } from "@mui/material/styles";
+import {
+  Search,
+  SearchIconWrapper,
+  StyledInputBase,
+} from "./searchJobsPagestyledComponents";
 import WorkRoundedIcon from "@mui/icons-material/WorkRounded";
-import BusinessRoundedIcon from "@mui/icons-material/BusinessRounded";
 import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
+import PropTypes from "prop-types";
+import SwipeableViews from "react-swipeable-views";
+import { useTheme } from "@mui/material/styles";
+import AppBar from "@mui/material/AppBar";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import PublicRoundedIcon from "@mui/icons-material/PublicRounded";
+import BusinessRoundedIcon from "@mui/icons-material/BusinessRounded";
+import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+import ReplayRoundedIcon from "@mui/icons-material/ReplayRounded";
+import CategoryRoundedIcon from "@mui/icons-material/CategoryRounded";
+import FilterListRoundedIcon from "@mui/icons-material/FilterListRounded";
+import {
+  countryData,
+  sortingData,
+  maxDistanceData,
+} from "../../common/data/formData";
+import { flexbox } from "@mui/system";
+import { useQuery } from "react-query";
+import { fetchCategories, fetchJobs } from "../../common/utils/asyncfuncs";
+import JobsListing from "../../components/JobsListing";
+import JobDetails from "../../components/JobDetails";
+import { useState } from "react";
 
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.primary.main, 0),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.primary.main, 0),
-  },
-  /*   marginRight: theme.spacing(2), */
-  marginLeft: 0,
-  width: "100%",
-  /*  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(3),
-    width: "auto",
-  }, */
-}));
+const app_id = "8028b95d";
+const app_key = "e55f767e4b51e106e03219958f6ef82d";
 
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
 
-const StyledInputBase = styled(TextField)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "20ch",
-    },
-  },
-}));
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `full-width-tab-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`,
+  };
+}
 
 export default function SearchJobsPage() {
+  const theme = useTheme();
+  const [value, setValue] = React.useState(0);
+
+  // Tab
+  const handleChangeTab = (event, newValue) => {
+    setValue(newValue);
+  };
+  const handleChangeTabIndex = (index) => {
+    setValue(index);
+  };
+
+  const [country, setCountry] = React.useState("it");
+  const [what, setWhat] = React.useState("");
+  const [category, setCategory] = React.useState("");
+  const [where, setWhere] = React.useState("");
+  const [mustToBeInclude, setMustToBeInclude] = React.useState("");
+  const [company, setCompany] = React.useState("");
+  const [maxDaysOld, setMaxDaysOld] = React.useState(null);
+  const [sort, setSort] = React.useState("");
+  const [maxDistance, setMaxDistance] = React.useState("");
+  const [page, setPage] = React.useState(1);
+  const [selectedJob, setSelectedJob] = useState(null);
+
+  // handleSelectedJob
+  const handleSelectedJob = (jobId) => {
+    setSelectedJob(jobId);
+  };
+
+  // simple fetch param
+  const simpleSearchParams = {
+    what: what,
+    where: where,
+    app_id: app_id,
+    app_key: app_key,
+    results_per_page: 20,
+  };
+
+  // advanced fetch param
+  const advancedSearchParams = {
+    country: country,
+    what: what,
+    category: category,
+    where: where,
+    what_and: mustToBeInclude,
+    company: company,
+    max_days_old: maxDaysOld,
+    results_per_page: 20,
+  };
+
+  // get categories
+  const categoriesData = useQuery(
+    [
+      "categoryData",
+      {
+        country: country,
+        params: { app_id: app_id, app_key: app_key },
+      },
+    ],
+    ({ queryKey }) => fetchCategories(queryKey[1]),
+    {
+      enabled: false,
+      staleTime: 300000000,
+      retry: 1,
+    }
+  );
+
+  // get jobs data
+  const jobsData = useQuery(
+    [
+      "jobsData",
+      {
+        country: country,
+        page: page,
+        params: simpleSearchParams,
+      },
+    ],
+    ({ queryKey }) => fetchJobs(queryKey[1]),
+    {
+      enabled: false,
+      refetchOnWindowFocus: false,
+      staleTime: 30000000,
+      retry: 1,
+    }
+  );
+
+  const selectedJobData = () => {
+    if (jobsData.data) {
+      return jobsData.data.results.filter((item) => item.id === selectedJob);
+    }
+  };
+
+  //handle pagination
+  const handlePage = (event, value) => {
+    setPage(value);
+    setTimeout(() => {
+      jobsData.refetch();
+    }, 100);
+  };
+
+  const paginationCount = () => {
+    if (jobsData.data) {
+      return Math.floor(jobsData.data.count / 20);
+    } else return 0;
+  };
+
+  const handleFieldsChanges = (event) => {
+    const name = event.target.name;
+    const id = event.target.id;
+    const value = event.target.value;
+    switch (id || name) {
+      case "whereFieldId":
+        setWhere(value);
+        break;
+      case "whatFieldId":
+        setWhat(value);
+        break;
+      case "categoryFieldId":
+        setCategory(value);
+        break;
+      case "mustToBeIncludeFieldId":
+        setMustToBeInclude(value);
+        break;
+      case "companyFieldId":
+        setCompany(value);
+        break;
+      case "max-days-fiald-id":
+        setMaxDaysOld(value);
+        break;
+      case "countryFieldId":
+        setCountry(value);
+        break;
+      case "sortFieldId":
+        setSort(value);
+        break;
+      case "maxDistance":
+        setMaxDistance(value);
+        break;
+    }
+  };
+
   return (
     <>
       <Container component={"div"} maxWidth="xl" sx={{ height: "100vh" }}>
-        <Container
-          component={"div"}
-          sx={{ backgroundColor: "white", borderRadius: 2, mt: 2 }}
-        >
-          <Typography variant="h4" align="center" sx={{ p: 1 }}>
-            Search
-          </Typography>
-          <Grid container spacing={2} p={2}>
-            <Grid item xs={4}>
-              <Search>
-                <SearchIconWrapper>
-                  <WorkRoundedIcon color="secondary" />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Job title"
-                  inputProps={{ "aria-label": "search" }}
-                />
-              </Search>
-            </Grid>
-
-            <Grid item xs={3}>
-              <Search>
-                <SearchIconWrapper>
-                  <BusinessRoundedIcon color="secondary" />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="All companies"
-                  inputProps={{ "aria-label": "search" }}
-                />
-              </Search>
-            </Grid>
-
-            <Grid item xs={3}>
-              <Search>
-                <SearchIconWrapper>
-                  <LocationOnRoundedIcon color="secondary" />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Anywhere"
-                  inputProps={{ "aria-label": "search" }}
-                />
-              </Search>
-            </Grid>
-            <Grid item xs={2}>
-              <Button variant="contained" sx={{ boxShadow: 0 }}>
-                Search
-              </Button>
-            </Grid>
-          </Grid>
-        </Container>
-        <Container
-          component={"div"}
+        <Box
           sx={{
-            backgroundColor: "white",
-            borderRadius: 2,
-            height: "100vh",
+            maxWidth: "xl",
             mt: 2,
           }}
         >
-          <Grid></Grid>
-        </Container>
+          <Box
+            sx={{
+              bgcolor: "background.paper",
+              borderRadius: 2,
+            }}
+          >
+            <AppBar position="static" sx={{ boxShadow: 0 }}>
+              <Tabs
+                value={value}
+                onChange={handleChangeTab}
+                indicatorColor="secondary"
+                textColor="inherit"
+                variant="fullWidth"
+                aria-label="full width tabs example"
+              >
+                <Tab label="Search" {...a11yProps(0)} />
+                <Tab label="Advanced research" {...a11yProps(1)} />
+              </Tabs>
+            </AppBar>
+            <SwipeableViews
+              axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+              index={value}
+              onChangeIndex={handleChangeTabIndex}
+            >
+              <TabPanel value={value} index={0} dir={theme.direction}>
+                <Grid
+                  container
+                  justifyContent={"space-around"}
+                  spacing={4}
+                  sx={{
+                    p: 2,
+                  }}
+                >
+                  <Grid item xs={12} md={6} lg={4}>
+                    <TextField
+                      id="whatFieldId"
+                      placeholder="e.g. Fullstack developer"
+                      label="Job title"
+                      variant="outlined"
+                      size="small"
+                      value={what}
+                      onChange={handleFieldsChanges}
+                      fullWidth
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <WorkRoundedIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6} lg={4}>
+                    <TextField
+                      id="whereFieldId"
+                      placeholder="city, region, postal code ect.."
+                      label="Where"
+                      variant="outlined"
+                      size="small"
+                      value={where}
+                      onChange={handleFieldsChanges}
+                      fullWidth
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LocationOnRoundedIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item md={1}>
+                    <Button
+                      onClick={jobsData.refetch}
+                      variant="contained"
+                      sx={{ boxShadow: 0 }}
+                    >
+                      Search
+                    </Button>
+                  </Grid>
+                </Grid>
+              </TabPanel>
+
+              <TabPanel value={value} index={1} dir={theme.direction}>
+                <Grid
+                  container
+                  justifyContent={"space-around"}
+                  spacing={4}
+                  sx={{
+                    p: 2,
+                  }}
+                >
+                  <Grid item xs={12} md={6} lg={4}>
+                    <TextField
+                      id="countryFieldId"
+                      name="countryFieldId"
+                      placeholder="Country"
+                      label="Country"
+                      variant="outlined"
+                      select
+                      size="small"
+                      onChange={handleFieldsChanges}
+                      fullWidth
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PublicRoundedIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    >
+                      {countryData.map((country) => (
+                        <MenuItem
+                          key={country.IsoCode}
+                          value={country.IsoCode}
+                          sx={{}}
+                        >
+                          {country.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={12} md={6} lg={4}>
+                    <TextField
+                      id="whatFieldId"
+                      placeholder="e.g. Fullstack developer"
+                      label="Job title"
+                      variant="outlined"
+                      size="small"
+                      value={what}
+                      onChange={handleFieldsChanges}
+                      fullWidth
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <WorkRoundedIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6} lg={4}>
+                    <TextField
+                      id="categoryFieldId"
+                      name="categoryFieldId"
+                      placeholder="Category"
+                      label="Category"
+                      variant="outlined"
+                      select
+                      size="small"
+                      onChange={handleFieldsChanges}
+                      fullWidth
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <CategoryRoundedIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    >
+                      {categoriesData.isSuccess ? (
+                        categoriesData.data.results.map((category) => (
+                          <MenuItem
+                            key={category.tag}
+                            value={category.tag}
+                            sx={{}}
+                          >
+                            {category.label}
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <p>(select country first)</p>
+                      )}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={12} md={6} lg={4}>
+                    <TextField
+                      id="whereFieldId"
+                      placeholder="city, region, postal code ect.."
+                      label="Where"
+                      variant="outlined"
+                      size="small"
+                      value={where}
+                      onChange={handleFieldsChanges}
+                      fullWidth
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LocationOnRoundedIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6} lg={4}>
+                    <TextField
+                      id="mustToBeIncludeFieldId"
+                      placeholder="e.g. Start-up, React"
+                      label="Must include"
+                      variant="outlined"
+                      size="small"
+                      value={mustToBeInclude}
+                      onChange={handleFieldsChanges}
+                      fullWidth
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <VisibilityRoundedIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6} lg={4}>
+                    <TextField
+                      id="companyFieldId"
+                      placeholder=""
+                      label="In this company"
+                      variant="outlined"
+                      size="small"
+                      value={company}
+                      onChange={handleFieldsChanges}
+                      fullWidth
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <BusinessRoundedIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6} lg={4}>
+                    <TextField
+                      id="max-days-fiald-id"
+                      placeholder="e.g. 5"
+                      label="Max days after pubblication"
+                      variant="outlined"
+                      size="small"
+                      value={maxDaysOld}
+                      type={"number"}
+                      fullWidth
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <ReplayRoundedIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6} lg={4}>
+                    <TextField
+                      id="sortFieldId"
+                      name="sortFieldId"
+                      placeholder=""
+                      label="Sort by"
+                      variant="outlined"
+                      select
+                      size="small"
+                      value={sort}
+                      onChange={handleFieldsChanges}
+                      fullWidth
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <FilterListRoundedIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    >
+                      {sortingData.map((sort) => (
+                        <MenuItem key={sort.value} value={sort.value} sx={{}}>
+                          {sort.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={12} md={6} lg={4}>
+                    <Box
+                      sx={{
+                        pl: 2,
+                        pr: 2,
+                      }}
+                    >
+                      <Typography variant="caption">Max distance</Typography>
+                      <Slider
+                        name="maxDistance"
+                        aria-label="Max distance"
+                        valueLabelDisplay="auto"
+                        value={maxDistance}
+                        onChange={handleFieldsChanges}
+                        step={10}
+                        marks={maxDistanceData.marks}
+                        min={maxDistanceData.min}
+                        max={maxDistanceData.max}
+                      />
+                    </Box>
+                  </Grid>
+                </Grid>
+                <Box sx={{ display: "flex ", justifyContent: "center" }}>
+                  <Button variant="contained" sx={{ boxShadow: 0 }}>
+                    Search
+                  </Button>
+                </Box>
+              </TabPanel>
+            </SwipeableViews>
+          </Box>
+        </Box>
+        <Box
+          sx={{
+            bgcolor: "background.paper",
+            mt: 4,
+            p: 2,
+            borderRadius: 2,
+            maxHeight: "90vh",
+          }}
+        >
+          {jobsData.data && (
+            <Grid container spacing={2} sx={{ height: "90vh" }}>
+              <Grid item xs={12}>
+                <Typography variant="h6" color="primary.main">
+                  {jobsData.data.count + " results:"}
+                </Typography>
+              </Grid>
+              <Grid item xs={4} sx={{ overflowY: "scroll", maxHeight: "85vh" }}>
+                <Box>
+                  <Pagination
+                    count={paginationCount()}
+                    variant="outlined"
+                    shape="rounded"
+                    page={page}
+                    onChange={handlePage}
+                  />
+                  <JobsListing
+                    jobsData={jobsData}
+                    handleSelectedJob={handleSelectedJob}
+                  />
+                  <Pagination
+                    count={paginationCount()}
+                    variant="outlined"
+                    shape="rounded"
+                    page={page}
+                    onChange={handlePage}
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={8}>
+                {selectedJobData()[0] && (
+                  <JobDetails selectedJobData={selectedJobData()} />
+                )}
+              </Grid>
+            </Grid>
+          )}
+        </Box>
       </Container>
     </>
   );
 }
-
-const top100Films = [
-  { title: "The Shawshank Redemption", year: 1994 },
-  { title: "The Godfather", year: 1972 },
-  { title: "The Godfather: Part II", year: 1974 },
-  { title: "The Dark Knight", year: 2008 },
-  { title: "12 Angry Men", year: 1957 },
-  { title: "Schindler's List", year: 1993 },
-  { title: "Pulp Fiction", year: 1994 },
-  {
-    title: "The Lord of the Rings: The Return of the King",
-    year: 2003,
-  },
-  { title: "The Good, the Bad and the Ugly", year: 1966 },
-  { title: "Fight Club", year: 1999 },
-  {
-    title: "The Lord of the Rings: The Fellowship of the Ring",
-    year: 2001,
-  },
-  {
-    title: "Star Wars: Episode V - The Empire Strikes Back",
-    year: 1980,
-  },
-  { title: "Forrest Gump", year: 1994 },
-  { title: "Inception", year: 2010 },
-  {
-    title: "The Lord of the Rings: The Two Towers",
-    year: 2002,
-  },
-  { title: "One Flew Over the Cuckoo's Nest", year: 1975 },
-  { title: "Goodfellas", year: 1990 },
-  { title: "The Matrix", year: 1999 },
-  { title: "Seven Samurai", year: 1954 },
-  {
-    title: "Star Wars: Episode IV - A New Hope",
-    year: 1977,
-  },
-  { title: "City of God", year: 2002 },
-  { title: "Se7en", year: 1995 },
-  { title: "The Silence of the Lambs", year: 1991 },
-  { title: "It's a Wonderful Life", year: 1946 },
-  { title: "Life Is Beautiful", year: 1997 },
-  { title: "The Usual Suspects", year: 1995 },
-  { title: "Léon: The Professional", year: 1994 },
-  { title: "Spirited Away", year: 2001 },
-  { title: "Saving Private Ryan", year: 1998 },
-  { title: "Once Upon a Time in the West", year: 1968 },
-  { title: "American History X", year: 1998 },
-  { title: "Interstellar", year: 2014 },
-  { title: "Casablanca", year: 1942 },
-  { title: "City Lights", year: 1931 },
-  { title: "Psycho", year: 1960 },
-  { title: "The Green Mile", year: 1999 },
-  { title: "The Intouchables", year: 2011 },
-  { title: "Modern Times", year: 1936 },
-  { title: "Raiders of the Lost Ark", year: 1981 },
-  { title: "Rear Window", year: 1954 },
-  { title: "The Pianist", year: 2002 },
-  { title: "The Departed", year: 2006 },
-  { title: "Terminator 2: Judgment Day", year: 1991 },
-  { title: "Back to the Future", year: 1985 },
-  { title: "Whiplash", year: 2014 },
-  { title: "Gladiator", year: 2000 },
-  { title: "Memento", year: 2000 },
-  { title: "The Prestige", year: 2006 },
-  { title: "The Lion King", year: 1994 },
-  { title: "Apocalypse Now", year: 1979 },
-  { title: "Alien", year: 1979 },
-  { title: "Sunset Boulevard", year: 1950 },
-  {
-    title:
-      "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb",
-    year: 1964,
-  },
-  { title: "The Great Dictator", year: 1940 },
-  { title: "Cinema Paradiso", year: 1988 },
-  { title: "The Lives of Others", year: 2006 },
-  { title: "Grave of the Fireflies", year: 1988 },
-  { title: "Paths of Glory", year: 1957 },
-  { title: "Django Unchained", year: 2012 },
-  { title: "The Shining", year: 1980 },
-  { title: "WALL·E", year: 2008 },
-  { title: "American Beauty", year: 1999 },
-  { title: "The Dark Knight Rises", year: 2012 },
-  { title: "Princess Mononoke", year: 1997 },
-  { title: "Aliens", year: 1986 },
-  { title: "Oldboy", year: 2003 },
-  { title: "Once Upon a Time in America", year: 1984 },
-  { title: "Witness for the Prosecution", year: 1957 },
-  { title: "Das Boot", year: 1981 },
-  { title: "Citizen Kane", year: 1941 },
-  { title: "North by Northwest", year: 1959 },
-  { title: "Vertigo", year: 1958 },
-  {
-    title: "Star Wars: Episode VI - Return of the Jedi",
-    year: 1983,
-  },
-  { title: "Reservoir Dogs", year: 1992 },
-  { title: "Braveheart", year: 1995 },
-  { title: "M", year: 1931 },
-  { title: "Requiem for a Dream", year: 2000 },
-  { title: "Amélie", year: 2001 },
-  { title: "A Clockwork Orange", year: 1971 },
-  { title: "Like Stars on Earth", year: 2007 },
-  { title: "Taxi Driver", year: 1976 },
-  { title: "Lawrence of Arabia", year: 1962 },
-  { title: "Double Indemnity", year: 1944 },
-  {
-    title: "Eternal Sunshine of the Spotless Mind",
-    year: 2004,
-  },
-  { title: "Amadeus", year: 1984 },
-  { title: "To Kill a Mockingbird", year: 1962 },
-  { title: "Toy Story 3", year: 2010 },
-  { title: "Logan", year: 2017 },
-  { title: "Full Metal Jacket", year: 1987 },
-  { title: "Dangal", year: 2016 },
-  { title: "The Sting", year: 1973 },
-  { title: "2001: A Space Odyssey", year: 1968 },
-  { title: "Singin' in the Rain", year: 1952 },
-  { title: "Toy Story", year: 1995 },
-  { title: "Bicycle Thieves", year: 1948 },
-  { title: "The Kid", year: 1921 },
-  { title: "Inglourious Basterds", year: 2009 },
-  { title: "Snatch", year: 2000 },
-  { title: "3 Idiots", year: 2009 },
-  { title: "Monty Python and the Holy Grail", year: 1975 },
-];

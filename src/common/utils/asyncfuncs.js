@@ -1,20 +1,22 @@
-import theMuseAPI from "../axios/theMuseApi";
+import adzunaApi from "../axios/adzunaApi";
 
 export const fetchJobs = async (queryKey) => {
   console.log(queryKey);
-  const res = await theMuseAPI.get("/jobs", {
-    params: queryKey,
-  });
+  const res = await adzunaApi.get(
+    `/jobs/${queryKey.country}/search/${queryKey.page}`,
+    {
+      params: queryKey.params,
+    }
+  );
   return res.data;
 };
 
-export const fetchJobId = async (jobId) => {
-  const res = await theMuseAPI.get("/jobs", {
-    params: jobId,
+// fetch categories
+
+export const fetchCategories = async (queryKey) => {
+  console.log(queryKey);
+  const res = await adzunaApi.get(`/jobs/${queryKey.country}/categories`, {
+    params: queryKey.params,
   });
   return res.data;
 };
-
-// companies list to fetch
-
-//

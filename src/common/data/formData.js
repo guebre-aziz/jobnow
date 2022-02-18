@@ -27,12 +27,16 @@ export const sortingData = [
 ];
 
 export const maxDistanceData = {
-  min: 0,
+  min: 5,
   max: 200,
   marks: [
     {
-      value: 0,
-      label: "0 km",
+      value: 5,
+      label: "5 km",
+    },
+    {
+      value: 100,
+      label: "100 km",
     },
     {
       value: 200,

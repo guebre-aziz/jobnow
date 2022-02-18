@@ -44,6 +44,7 @@ function LinkTab(props) {
   );
 }
 
+console.log(process.env.REACT_APP_APP_ID);
 export default function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -149,9 +150,7 @@ export default function ResponsiveAppBar() {
                 onChange={handleTab}
                 aria-label="nav tabs example"
               >
-                <LinkTab label="Home" href="/home" />
-                <LinkTab label="Jobs" href="/search-jobs" />
-                <LinkTab label="Companies" href="/search-companies" />
+                <LinkTab label="Search" href="/search-jobs" />
               </Tabs>
             </Box>
           </Box>
@@ -187,7 +186,6 @@ export default function ResponsiveAppBar() {
           </Box>
         </Toolbar>
       </Container>
-      {/* <Divider /> */}
     </AppBar>
   );
 }

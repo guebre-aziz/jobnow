@@ -8,11 +8,11 @@ import LandingPage from "./pages/landingPage/LandingPage";
 import HomePage from "./pages/homePage/HomePage";
 import SearchJobsPage from "./pages/searchJobsPage/SearchJobsPage";
 import JobDetails from "./pages/jobDetails/JobDetails";
-import SearchCompaniesPage from "./pages/searchCompaniesPage/SearchCompaniesPage";
 import NotFoundPage from "./pages/notFoundPage/NotFoundFound";
 import ResponsiveAppBar from "./components/AppBar";
 import { ThemeProvider } from "@mui/material";
 import theme from "./assets/styles/theme";
+import Footer from "./components/Footer";
 const queryClient = new QueryClient();
 
 export default function App() {
@@ -23,17 +23,13 @@ export default function App() {
           <BrowserRouter>
             <ResponsiveAppBar />
             <Routes>
-              <Route path="/example" element={<Example />} />
               <Route path="/" element={<LandingPage />} />
               <Route path="/home" element={<HomePage />} />
               <Route path="/search-jobs" element={<SearchJobsPage />} />
               <Route path="/job-details" element={<JobDetails />} />
-              <Route
-                path="/search-companies"
-                element={<SearchCompaniesPage />}
-              />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
+            <Footer />
           </BrowserRouter>
         </ThemeProvider>
         <ReactQueryDevtools initialIsOpen={false} />
@@ -41,42 +37,3 @@ export default function App() {
     </>
   );
 }
-
-const Example = () => {
-  const [country, setCountry] = useState("fr");
-  const [page, setPage] = useState(1);
-  const app_id = "8028b95d";
-  const app_key = "e55f767e4b51e106e03219958f6ef82d";
-
-  const { isLoading, error, data } = useQuery(
-    [
-      "repoData",
-      {
-        country: country,
-        page: page,
-        params: { app_id: app_id, app_key: app_key },
-      },
-    ],
-    ({ queryKey }) => fetchJobs(queryKey[1]),
-    {
-      staleTime: 300000,
-      retry: 1,
-    }
-  );
-
-  if (isLoading) return "Loading...";
-
-  if (error) return "An error has occurred: " + error.message;
-
-  console.log(data);
-
-  return (
-    <div>
-      {/* <h1>{data.name}</h1>
-      <p>{data.description}</p>
-      <strong>👀 {data.subscribers_count}</strong>{" "}
-      <strong>✨ {data.stargazers_count}</strong>{" "}
-      <strong>🍴 {data.forks_count}</strong> */}
-    </div>
-  );
-};

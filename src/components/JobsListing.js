@@ -14,25 +14,16 @@ import {
 import JobCard from "./JobCard";
 
 export default function JobsListing(props) {
-  const { isLoading, data, error } = props.jobsData;
+  const { jobsData, selectedJob, handleSelectedJob } = props;
 
-  return isLoading ? (
-    <Box>
-      <Skeleton />
-      <Skeleton animation="wave" />
-      <Skeleton animation={false} />
-    </Box>
-  ) : data ? (
-    data.results.map((job) => {
-      return (
-        <JobCard
-          key={job.id}
-          jobData={job}
-          handleSelectedJob={props.handleSelectedJob}
-        />
-      );
-    })
-  ) : (
-    <p>error</p>
-  );
+  return jobsData.data.results.map((job) => {
+    return (
+      <JobCard
+        key={job.id}
+        jobData={job}
+        selectedJob={selectedJob}
+        handleSelectedJob={handleSelectedJob}
+      />
+    );
+  });
 }

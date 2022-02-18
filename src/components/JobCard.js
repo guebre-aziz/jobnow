@@ -13,10 +13,22 @@ import {
 } from "@mui/material";
 
 export default function JobCard(props) {
-  const jobData = props.jobData;
+  const { jobData, selectedJob } = props;
+
+  const selectedJobColor = () =>
+    selectedJob === jobData.id ? "primary.main" : "inherit";
+
   return (
     <>
-      <Card variant="outlined" sx={{ mt: 2, mr: 2, boxShadow: 0 }}>
+      <Card
+        variant="outlined"
+        sx={{
+          mt: 2,
+          mr: 2,
+          boxShadow: 0,
+          backgroundColor: `${selectedJobColor()}`,
+        }}
+      >
         <CardActionArea>
           <CardContent onClick={() => props.handleSelectedJob(jobData.id)}>
             <Typography variant="h6" component="div">

@@ -7,47 +7,24 @@ import {
   Input,
   InputBase,
   Box,
-  Divider,
-  TextField,
-  InputAdornment,
-  MenuItem,
-  Paper,
-  Slider,
   Pagination,
+  FormControl,
 } from "@mui/material";
-import {
-  Search,
-  SearchIconWrapper,
-  StyledInputBase,
-} from "./searchJobsPagestyledComponents";
-import WorkRoundedIcon from "@mui/icons-material/WorkRounded";
-import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
-import PropTypes from "prop-types";
 import SwipeableViews from "react-swipeable-views";
 import { useTheme } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import PublicRoundedIcon from "@mui/icons-material/PublicRounded";
-import BusinessRoundedIcon from "@mui/icons-material/BusinessRounded";
-import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
-import ReplayRoundedIcon from "@mui/icons-material/ReplayRounded";
-import CategoryRoundedIcon from "@mui/icons-material/CategoryRounded";
-import FilterListRoundedIcon from "@mui/icons-material/FilterListRounded";
-import {
-  countryData,
-  sortingData,
-  maxDistanceData,
-} from "../../common/data/formData";
-import { flexbox } from "@mui/system";
 import { useQuery } from "react-query";
 import { fetchCategories, fetchJobs } from "../../common/utils/asyncfuncs";
 import JobsListing from "../../components/JobsListing";
 import JobDetails from "../../components/JobDetails";
+import Loading from "../../components/Loading";
+import Error from "../../components/Error";
 import { useState } from "react";
-
-const app_id = "8028b95d";
-const app_key = "e55f767e4b51e106e03219958f6ef82d";
+import LoadingButton from "@mui/lab/LoadingButton";
+import SimpleSearchForm from "../../components/SimpleSearchForm";
+import AdvancedSearchForm from "../../components/AdvancedSearchForm";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -69,12 +46,6 @@ function TabPanel(props) {
   );
 }
 
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
-
 function a11yProps(index) {
   return {
     id: `full-width-tab-${index}`,
@@ -84,7 +55,7 @@ function a11yProps(index) {
 
 export default function SearchJobsPage() {
   const theme = useTheme();
-  const [value, setValue] = React.useState(0);
+  const [tabPanelValue, setValue] = React.useState(0);
 
   // Tab
   const handleChangeTab = (event, newValue) => {
@@ -99,9 +70,8 @@ export default function SearchJobsPage() {
   const [category, setCategory] = React.useState("");
   const [where, setWhere] = React.useState("");
   const [mustToBeInclude, setMustToBeInclude] = React.useState("");
-  const [company, setCompany] = React.useState("");
   const [maxDaysOld, setMaxDaysOld] = React.useState(null);
-  const [sort, setSort] = React.useState("");
+  const [sortBy, setSort] = React.useState("");
   const [maxDistance, setMaxDistance] = React.useState("");
   const [page, setPage] = React.useState(1);
   const [selectedJob, setSelectedJob] = useState(null);
@@ -115,39 +85,34 @@ export default function SearchJobsPage() {
   const simpleSearchParams = {
     what: what,
     where: where,
-    app_id: app_id,
-    app_key: app_key,
+    app_id: process.env.REACT_APP_APP_ID,
+    app_key: process.env.REACT_APP_APP_KEY,
     results_per_page: 20,
   };
 
   // advanced fetch param
   const advancedSearchParams = {
-    country: country,
     what: what,
     category: category,
     where: where,
     what_and: mustToBeInclude,
-    company: company,
     max_days_old: maxDaysOld,
+    distance: maxDistance,
+    app_id: process.env.REACT_APP_APP_ID,
+    app_key: process.env.REACT_APP_APP_KEY,
     results_per_page: 20,
   };
 
-  // get categories
-  const categoriesData = useQuery(
-    [
-      "categoryData",
-      {
-        country: country,
-        params: { app_id: app_id, app_key: app_key },
-      },
-    ],
-    ({ queryKey }) => fetchCategories(queryKey[1]),
-    {
-      enabled: false,
-      staleTime: 300000000,
-      retry: 1,
+  const selectedParams = () => {
+    let params = {};
+    if (tabPanelValue === 0) {
+      params = simpleSearchParams;
     }
-  );
+    if (tabPanelValue === 1) {
+      params = advancedSearchParams;
+    }
+    return params;
+  };
 
   // get jobs data
   const jobsData = useQuery(
@@ -156,7 +121,7 @@ export default function SearchJobsPage() {
       {
         country: country,
         page: page,
-        params: simpleSearchParams,
+        params: selectedParams(),
       },
     ],
     ({ queryKey }) => fetchJobs(queryKey[1]),
@@ -174,20 +139,20 @@ export default function SearchJobsPage() {
     }
   };
 
-  //handle pagination
+  // handle pagination
   const handlePage = (event, value) => {
     setPage(value);
     setTimeout(() => {
       jobsData.refetch();
     }, 100);
   };
-
   const paginationCount = () => {
     if (jobsData.data) {
       return Math.floor(jobsData.data.count / 20);
     } else return 0;
   };
 
+  // handle texts fields
   const handleFieldsChanges = (event) => {
     const name = event.target.name;
     const id = event.target.id;
@@ -205,10 +170,7 @@ export default function SearchJobsPage() {
       case "mustToBeIncludeFieldId":
         setMustToBeInclude(value);
         break;
-      case "companyFieldId":
-        setCompany(value);
-        break;
-      case "max-days-fiald-id":
+      case "max-days-field-id":
         setMaxDaysOld(value);
         break;
       case "countryFieldId":
@@ -220,12 +182,23 @@ export default function SearchJobsPage() {
       case "maxDistance":
         setMaxDistance(value);
         break;
+      default:
+        break;
     }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    jobsData.refetch();
   };
 
   return (
     <>
-      <Container component={"div"} maxWidth="xl" sx={{ height: "100vh" }}>
+      <Container
+        component={"div"}
+        maxWidth="xl"
+        sx={{ /* height: "100vh" */ mb: 2 }}
+      >
         <Box
           sx={{
             maxWidth: "xl",
@@ -240,7 +213,7 @@ export default function SearchJobsPage() {
           >
             <AppBar position="static" sx={{ boxShadow: 0 }}>
               <Tabs
-                value={value}
+                value={tabPanelValue}
                 onChange={handleChangeTab}
                 indicatorColor="secondary"
                 textColor="inherit"
@@ -253,290 +226,33 @@ export default function SearchJobsPage() {
             </AppBar>
             <SwipeableViews
               axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-              index={value}
+              index={tabPanelValue}
               onChangeIndex={handleChangeTabIndex}
             >
-              <TabPanel value={value} index={0} dir={theme.direction}>
-                <Grid
-                  container
-                  justifyContent={"space-around"}
-                  spacing={4}
-                  sx={{
-                    p: 2,
-                  }}
-                >
-                  <Grid item xs={12} md={6} lg={4}>
-                    <TextField
-                      id="whatFieldId"
-                      placeholder="e.g. Fullstack developer"
-                      label="Job title"
-                      variant="outlined"
-                      size="small"
-                      value={what}
-                      onChange={handleFieldsChanges}
-                      fullWidth
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <WorkRoundedIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6} lg={4}>
-                    <TextField
-                      id="whereFieldId"
-                      placeholder="city, region, postal code ect.."
-                      label="Where"
-                      variant="outlined"
-                      size="small"
-                      value={where}
-                      onChange={handleFieldsChanges}
-                      fullWidth
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <LocationOnRoundedIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item md={1}>
-                    <Button
-                      onClick={jobsData.refetch}
-                      variant="contained"
-                      sx={{ boxShadow: 0 }}
-                    >
-                      Search
-                    </Button>
-                  </Grid>
-                </Grid>
+              <TabPanel value={tabPanelValue} index={0} dir={theme.direction}>
+                <SimpleSearchForm
+                  jobsData={jobsData}
+                  handleSubmit={handleSubmit}
+                  handleFieldsChanges={handleFieldsChanges}
+                  what={what}
+                  where={where}
+                />
               </TabPanel>
 
-              <TabPanel value={value} index={1} dir={theme.direction}>
-                <Grid
-                  container
-                  justifyContent={"space-around"}
-                  spacing={4}
-                  sx={{
-                    p: 2,
-                  }}
-                >
-                  <Grid item xs={12} md={6} lg={4}>
-                    <TextField
-                      id="countryFieldId"
-                      name="countryFieldId"
-                      placeholder="Country"
-                      label="Country"
-                      variant="outlined"
-                      select
-                      size="small"
-                      onChange={handleFieldsChanges}
-                      fullWidth
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <PublicRoundedIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    >
-                      {countryData.map((country) => (
-                        <MenuItem
-                          key={country.IsoCode}
-                          value={country.IsoCode}
-                          sx={{}}
-                        >
-                          {country.name}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={12} md={6} lg={4}>
-                    <TextField
-                      id="whatFieldId"
-                      placeholder="e.g. Fullstack developer"
-                      label="Job title"
-                      variant="outlined"
-                      size="small"
-                      value={what}
-                      onChange={handleFieldsChanges}
-                      fullWidth
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <WorkRoundedIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6} lg={4}>
-                    <TextField
-                      id="categoryFieldId"
-                      name="categoryFieldId"
-                      placeholder="Category"
-                      label="Category"
-                      variant="outlined"
-                      select
-                      size="small"
-                      onChange={handleFieldsChanges}
-                      fullWidth
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <CategoryRoundedIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    >
-                      {categoriesData.isSuccess ? (
-                        categoriesData.data.results.map((category) => (
-                          <MenuItem
-                            key={category.tag}
-                            value={category.tag}
-                            sx={{}}
-                          >
-                            {category.label}
-                          </MenuItem>
-                        ))
-                      ) : (
-                        <p>(select country first)</p>
-                      )}
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={12} md={6} lg={4}>
-                    <TextField
-                      id="whereFieldId"
-                      placeholder="city, region, postal code ect.."
-                      label="Where"
-                      variant="outlined"
-                      size="small"
-                      value={where}
-                      onChange={handleFieldsChanges}
-                      fullWidth
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <LocationOnRoundedIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6} lg={4}>
-                    <TextField
-                      id="mustToBeIncludeFieldId"
-                      placeholder="e.g. Start-up, React"
-                      label="Must include"
-                      variant="outlined"
-                      size="small"
-                      value={mustToBeInclude}
-                      onChange={handleFieldsChanges}
-                      fullWidth
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <VisibilityRoundedIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6} lg={4}>
-                    <TextField
-                      id="companyFieldId"
-                      placeholder=""
-                      label="In this company"
-                      variant="outlined"
-                      size="small"
-                      value={company}
-                      onChange={handleFieldsChanges}
-                      fullWidth
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <BusinessRoundedIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6} lg={4}>
-                    <TextField
-                      id="max-days-fiald-id"
-                      placeholder="e.g. 5"
-                      label="Max days after pubblication"
-                      variant="outlined"
-                      size="small"
-                      value={maxDaysOld}
-                      type={"number"}
-                      fullWidth
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <ReplayRoundedIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} md={6} lg={4}>
-                    <TextField
-                      id="sortFieldId"
-                      name="sortFieldId"
-                      placeholder=""
-                      label="Sort by"
-                      variant="outlined"
-                      select
-                      size="small"
-                      value={sort}
-                      onChange={handleFieldsChanges}
-                      fullWidth
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <FilterListRoundedIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    >
-                      {sortingData.map((sort) => (
-                        <MenuItem key={sort.value} value={sort.value} sx={{}}>
-                          {sort.name}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={12} md={6} lg={4}>
-                    <Box
-                      sx={{
-                        pl: 2,
-                        pr: 2,
-                      }}
-                    >
-                      <Typography variant="caption">Max distance</Typography>
-                      <Slider
-                        name="maxDistance"
-                        aria-label="Max distance"
-                        valueLabelDisplay="auto"
-                        value={maxDistance}
-                        onChange={handleFieldsChanges}
-                        step={10}
-                        marks={maxDistanceData.marks}
-                        min={maxDistanceData.min}
-                        max={maxDistanceData.max}
-                      />
-                    </Box>
-                  </Grid>
-                </Grid>
-                <Box sx={{ display: "flex ", justifyContent: "center" }}>
-                  <Button variant="contained" sx={{ boxShadow: 0 }}>
-                    Search
-                  </Button>
-                </Box>
+              <TabPanel value={tabPanelValue} index={1} dir={theme.direction}>
+                <AdvancedSearchForm
+                  jobsData={jobsData}
+                  handleSubmit={handleSubmit}
+                  handleFieldsChanges={handleFieldsChanges}
+                  country={country}
+                  what={what}
+                  where={where}
+                  category={category}
+                  mustToBeInclude={mustToBeInclude}
+                  maxDaysOld={maxDaysOld}
+                  sortBy={sortBy}
+                  maxDistance={maxDistance}
+                />
               </TabPanel>
             </SwipeableViews>
           </Box>
@@ -550,42 +266,66 @@ export default function SearchJobsPage() {
             maxHeight: "90vh",
           }}
         >
-          {jobsData.data && (
-            <Grid container spacing={2} sx={{ height: "90vh" }}>
+          <Grid container spacing={2} sx={{ height: "90vh" }}>
+            {jobsData.isLoading && (
               <Grid item xs={12}>
-                <Typography variant="h6" color="primary.main">
-                  {jobsData.data.count + " results:"}
-                </Typography>
+                <Loading />
               </Grid>
-              <Grid item xs={4} sx={{ overflowY: "scroll", maxHeight: "85vh" }}>
-                <Box>
-                  <Pagination
-                    count={paginationCount()}
-                    variant="outlined"
-                    shape="rounded"
-                    page={page}
-                    onChange={handlePage}
-                  />
-                  <JobsListing
-                    jobsData={jobsData}
-                    handleSelectedJob={handleSelectedJob}
-                  />
-                  <Pagination
-                    count={paginationCount()}
-                    variant="outlined"
-                    shape="rounded"
-                    page={page}
-                    onChange={handlePage}
-                  />
-                </Box>
-              </Grid>
-              <Grid item xs={8}>
-                {selectedJobData()[0] && (
-                  <JobDetails selectedJobData={selectedJobData()} />
+            )}
+            {jobsData.data && (
+              <>
+                <Grid item xs={12}>
+                  {jobsData.data.results.length > 0 ? (
+                    <Typography variant="h6" color="primary.main">
+                      {jobsData.data && jobsData.data.count + " results:"}
+                    </Typography>
+                  ) : (
+                    <Typography variant="h6" color="primary.main">
+                      No jobs found.
+                    </Typography>
+                  )}
+                </Grid>
+                {jobsData.data.results.length > 0 && (
+                  <Grid
+                    item
+                    xs={4}
+                    sx={{ overflowY: "scroll", maxHeight: "85vh" }}
+                  >
+                    <Box>
+                      <Pagination
+                        count={paginationCount()}
+                        variant="outlined"
+                        shape="rounded"
+                        size="small"
+                        page={page}
+                        onChange={handlePage}
+                      />
+                      <JobsListing
+                        jobsData={jobsData}
+                        selectedJob={selectedJob}
+                        handleSelectedJob={handleSelectedJob}
+                      />
+                      <Pagination
+                        count={paginationCount()}
+                        variant="outlined"
+                        shape="rounded"
+                        size="small"
+                        page={page}
+                        onChange={handlePage}
+                        sx={{ mt: 2 }}
+                      />
+                    </Box>
+                  </Grid>
                 )}
-              </Grid>
-            </Grid>
-          )}
+                <Grid item xs={8}>
+                  {selectedJobData()[0] && (
+                    <JobDetails selectedJobData={selectedJobData()} />
+                  )}
+                </Grid>
+              </>
+            )}
+            {jobsData.isError && <Error error={jobsData.error} />}
+          </Grid>
         </Box>
       </Container>
     </>

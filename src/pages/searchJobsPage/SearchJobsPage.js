@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Grid,
@@ -17,11 +17,10 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { useQuery } from "react-query";
 import { fetchCategories, fetchJobs } from "../../common/utils/asyncfuncs";
-import JobsListing from "../../components/JobsListing";
-import JobDetails from "../../components/JobDetails";
+import JobsListing from "../../components/jobs-listing/JobsListing";
+import JobDetailsCard from "../../components/JobDetailsCard";
 import Loading from "../../components/Loading";
 import Error from "../../components/Error";
-import { useState } from "react";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SimpleSearchForm from "../../components/SimpleSearchForm";
 import AdvancedSearchForm from "../../components/AdvancedSearchForm";
@@ -55,33 +54,33 @@ function a11yProps(index) {
 
 export default function SearchJobsPage() {
   const theme = useTheme();
-  const [tabPanelValue, setValue] = React.useState(0);
 
   // Tab
+  const [tabPanelValue, setTabPanelValue] = useState(0);
   const handleChangeTab = (event, newValue) => {
-    setValue(newValue);
+    setTabPanelValue(newValue);
   };
   const handleChangeTabIndex = (index) => {
-    setValue(index);
+    setTabPanelValue(index);
   };
 
-  const [country, setCountry] = React.useState("it");
-  const [what, setWhat] = React.useState("");
-  const [category, setCategory] = React.useState("");
-  const [where, setWhere] = React.useState("");
-  const [mustToBeInclude, setMustToBeInclude] = React.useState("");
-  const [maxDaysOld, setMaxDaysOld] = React.useState(null);
-  const [sortBy, setSort] = React.useState("");
-  const [maxDistance, setMaxDistance] = React.useState("");
-  const [page, setPage] = React.useState(1);
-  const [selectedJob, setSelectedJob] = useState(null);
+  const [country, setCountry] = useState("it");
+  const [what, setWhat] = useState("");
+  const [category, setCategory] = useState("");
+  const [where, setWhere] = useState("");
+  const [mustToBeInclude, setMustToBeInclude] = useState("");
+  const [maxDaysOld, setMaxDaysOld] = useState(null);
+  const [sortBy, setSort] = useState("");
+  const [maxDistance, setMaxDistance] = useState("");
+  const [page, setPage] = useState(1);
+  const [selectedJobId, setSelectedJobId] = useState(null);
 
   // handleSelectedJob
   const handleSelectedJob = (jobId) => {
-    setSelectedJob(jobId);
+    setSelectedJobId(jobId);
   };
 
-  // simple fetch param
+  // simple fetch params
   const simpleSearchParams = {
     what: what,
     where: where,
@@ -90,7 +89,7 @@ export default function SearchJobsPage() {
     results_per_page: 20,
   };
 
-  // advanced fetch param
+  // advanced fetch params
   const advancedSearchParams = {
     what: what,
     category: category,
@@ -106,9 +105,11 @@ export default function SearchJobsPage() {
   const selectedParams = () => {
     let params = {};
     if (tabPanelValue === 0) {
+      // simple search panel
       params = simpleSearchParams;
     }
     if (tabPanelValue === 1) {
+      // advanced search panel
       params = advancedSearchParams;
     }
     return params;
@@ -121,7 +122,7 @@ export default function SearchJobsPage() {
       {
         country: country,
         page: page,
-        params: selectedParams(),
+        params: selectedParams(), // returned params depend on wich panel we are
       },
     ],
     ({ queryKey }) => fetchJobs(queryKey[1]),
@@ -135,7 +136,7 @@ export default function SearchJobsPage() {
 
   const selectedJobData = () => {
     if (jobsData.data) {
-      return jobsData.data.results.filter((item) => item.id === selectedJob);
+      return jobsData.data.results.find((item) => item.id === selectedJobId);
     }
   };
 
@@ -151,6 +152,18 @@ export default function SearchJobsPage() {
       return Math.floor(jobsData.data.count / 20);
     } else return 0;
   };
+  const PaginationBox = () => (
+    <Box sx={{ display: "flex", justifyContent: "center" }}>
+      <Pagination
+        count={paginationCount()}
+        variant="outlined"
+        shape="rounded"
+        size="small"
+        page={page}
+        onChange={handlePage}
+      />
+    </Box>
+  );
 
   // handle texts fields
   const handleFieldsChanges = (event) => {
@@ -192,142 +205,139 @@ export default function SearchJobsPage() {
     jobsData.refetch();
   };
 
-  return (
-    <>
-      <Container
-        component={"div"}
-        maxWidth="xl"
-        sx={{ /* height: "100vh" */ mb: 2 }}
-      >
-        <Box
-          sx={{
-            maxWidth: "xl",
-            mt: 2,
-          }}
-        >
-          <Box
-            sx={{
-              bgcolor: "background.paper",
-              borderRadius: 2,
-            }}
-          >
-            <AppBar position="static" sx={{ boxShadow: 0 }}>
-              <Tabs
-                value={tabPanelValue}
-                onChange={handleChangeTab}
-                indicatorColor="secondary"
-                textColor="inherit"
-                variant="fullWidth"
-                aria-label="full width tabs example"
-              >
-                <Tab label="Search" {...a11yProps(0)} />
-                <Tab label="Advanced research" {...a11yProps(1)} />
-              </Tabs>
-            </AppBar>
-            <SwipeableViews
-              axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-              index={tabPanelValue}
-              onChangeIndex={handleChangeTabIndex}
-            >
-              <TabPanel value={tabPanelValue} index={0} dir={theme.direction}>
-                <SimpleSearchForm
-                  jobsData={jobsData}
-                  handleSubmit={handleSubmit}
-                  handleFieldsChanges={handleFieldsChanges}
-                  what={what}
-                  where={where}
-                />
-              </TabPanel>
+  // auto select first item on data change
+  useEffect(() => {
+    if (jobsData.data) {
+      setSelectedJobId(jobsData.data.results[0].id);
+    }
+  }, [jobsData.data]);
 
-              <TabPanel value={tabPanelValue} index={1} dir={theme.direction}>
-                <AdvancedSearchForm
-                  jobsData={jobsData}
-                  handleSubmit={handleSubmit}
-                  handleFieldsChanges={handleFieldsChanges}
-                  country={country}
-                  what={what}
-                  where={where}
-                  category={category}
-                  mustToBeInclude={mustToBeInclude}
-                  maxDaysOld={maxDaysOld}
-                  sortBy={sortBy}
-                  maxDistance={maxDistance}
-                />
-              </TabPanel>
-            </SwipeableViews>
-          </Box>
-        </Box>
+  useEffect(() => {
+    return () => {
+      setTabPanelValue(null);
+    };
+  }, []);
+
+  return (
+    <Container component={"div"} maxWidth="xl" sx={{ mb: 2 }}>
+      <Box sx={{ width: "100%", mt: 2 }}>
         <Box
           sx={{
             bgcolor: "background.paper",
-            mt: 4,
-            p: 2,
             borderRadius: 2,
-            maxHeight: "90vh",
           }}
         >
-          <Grid container spacing={2} sx={{ height: "90vh" }}>
-            {jobsData.isLoading && (
-              <Grid item xs={12}>
-                <Loading />
-              </Grid>
-            )}
-            {jobsData.data && (
-              <>
-                <Grid item xs={12}>
-                  {jobsData.data.results.length > 0 ? (
-                    <Typography variant="h6" color="primary.main">
-                      {jobsData.data && jobsData.data.count + " results:"}
-                    </Typography>
-                  ) : (
-                    <Typography variant="h6" color="primary.main">
-                      No jobs found.
-                    </Typography>
-                  )}
-                </Grid>
-                {jobsData.data.results.length > 0 && (
-                  <Grid
-                    item
-                    xs={4}
-                    sx={{ overflowY: "scroll", maxHeight: "85vh" }}
-                  >
-                    <Box>
-                      <Pagination
-                        count={paginationCount()}
-                        variant="outlined"
-                        shape="rounded"
-                        size="small"
-                        page={page}
-                        onChange={handlePage}
-                      />
-                      <JobsListing
-                        jobsData={jobsData}
-                        selectedJob={selectedJob}
-                        handleSelectedJob={handleSelectedJob}
-                      />
-                      <Pagination
-                        count={paginationCount()}
-                        variant="outlined"
-                        shape="rounded"
-                        size="small"
-                        page={page}
-                        onChange={handlePage}
-                        sx={{ mt: 2 }}
-                      />
-                    </Box>
-                  </Grid>
-                )}
-                <Grid item xs={8}>
-                  {selectedJobData()[0] && (
-                    <JobDetails selectedJobData={selectedJobData()} />
-                  )}
-                </Grid>
-              </>
-            )}
-            {jobsData.isError && <Error error={jobsData.error} />}
-          </Grid>
+          <AppBar position="static" sx={{ boxShadow: 0 }}>
+            <Tabs
+              value={tabPanelValue}
+              onChange={handleChangeTab}
+              indicatorColor="secondary"
+              textColor="inherit"
+              variant="fullWidth"
+              aria-label="full width tabs example"
+            >
+              <Tab label="Search" {...a11yProps(0)} />
+              <Tab label="Advanced research" {...a11yProps(1)} />
+            </Tabs>
+          </AppBar>
+          <SwipeableViews
+            axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+            index={tabPanelValue}
+            onChangeIndex={handleChangeTabIndex}
+          >
+            <TabPanel value={tabPanelValue} index={0} dir={theme.direction}>
+              <SimpleSearchForm
+                jobsData={jobsData}
+                handleSubmit={handleSubmit}
+                handleFieldsChanges={handleFieldsChanges}
+                what={what}
+                where={where}
+              />
+            </TabPanel>
+
+            <TabPanel value={tabPanelValue} index={1} dir={theme.direction}>
+              <AdvancedSearchForm
+                jobsData={jobsData}
+                handleSubmit={handleSubmit}
+                handleFieldsChanges={handleFieldsChanges}
+                country={country}
+                what={what}
+                where={where}
+                category={category}
+                mustToBeInclude={mustToBeInclude}
+                maxDaysOld={maxDaysOld}
+                sortBy={sortBy}
+                maxDistance={maxDistance}
+              />
+            </TabPanel>
+          </SwipeableViews>
         </Box>
-      </Container>
-    </>
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          bgcolor: "background.paper",
+          mt: 4,
+          p: 2,
+          borderRadius: 2,
+          maxHeight: "90vh",
+        }}
+      >
+        <Grid container spacing={2} sx={{ height: "90vh" }}>
+          {jobsData.isLoading && (
+            <Grid item xs={12}>
+              <Loading />
+            </Grid>
+          )}
+          {jobsData.data && (
+            <>
+              <Grid item xs={12}>
+                {jobsData.data.results.length > 0 ? (
+                  <Typography variant="h6" color="primary.main">
+                    {jobsData.data && jobsData.data.count + " results:"}
+                  </Typography>
+                ) : (
+                  <Typography variant="h6" color="primary.main">
+                    No jobs found.
+                  </Typography>
+                )}
+              </Grid>
+              {jobsData.data.results.length > 0 && (
+                <Grid
+                  item
+                  sm={12}
+                  md={4}
+                  sx={{ overflowY: "auto", maxHeight: "85vh" }}
+                >
+                  <Box>
+                    <PaginationBox />
+                    <JobsListing
+                      jobsData={jobsData}
+                      selectedJob={selectedJobId}
+                      handleSelectedJob={handleSelectedJob}
+                    />
+                    <PaginationBox />
+                  </Box>
+                </Grid>
+              )}
+              <Grid
+                item
+                md={8}
+                sx={{
+                  overflowY: "auto",
+                  maxHeight: "85vh",
+                  [theme.breakpoints.down("md")]: { display: "none" },
+                }}
+              >
+                {selectedJobData() && (
+                  <JobDetailsCard selectedJobData={selectedJobData()} />
+                )}
+              </Grid>
+            </>
+          )}
+          {jobsData.isError && <Error error={jobsData.error} />}
+        </Grid>
+      </Box>
+    </Container>
   );
 }

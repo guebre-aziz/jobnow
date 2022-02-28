@@ -1,16 +1,5 @@
 import React from "react";
-import {
-  Grid,
-  Typography,
-  Skeleton,
-  Box,
-  Paper,
-  Card,
-  CardContent,
-  CardActionArea,
-  Button,
-  CardActions,
-} from "@mui/material";
+
 import JobCard from "./JobCard";
 
 export default function JobsListing(props) {

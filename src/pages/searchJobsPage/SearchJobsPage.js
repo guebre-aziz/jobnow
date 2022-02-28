@@ -24,8 +24,9 @@ import Error from "../../components/Error";
 import LoadingButton from "@mui/lab/LoadingButton";
 import SimpleSearchForm from "../../components/SimpleSearchForm";
 import AdvancedSearchForm from "../../components/AdvancedSearchForm";
+import SearchSection from "../../components/SearchSection";
 
-function TabPanel(props) {
+/* function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
   return (
@@ -50,7 +51,7 @@ function a11yProps(index) {
     id: `full-width-tab-${index}`,
     "aria-controls": `full-width-tabpanel-${index}`,
   };
-}
+} */
 
 export default function SearchJobsPage() {
   const theme = useTheme();
@@ -96,6 +97,7 @@ export default function SearchJobsPage() {
     where: where,
     what_and: mustToBeInclude,
     max_days_old: maxDaysOld,
+    sortBy: sortBy,
     distance: maxDistance,
     app_id: process.env.REACT_APP_APP_ID,
     app_key: process.env.REACT_APP_APP_KEY,
@@ -212,67 +214,26 @@ export default function SearchJobsPage() {
     }
   }, [jobsData.data]);
 
-  useEffect(() => {
-    return () => {
-      setTabPanelValue(null);
-    };
-  }, []);
-
   return (
     <Container component={"div"} maxWidth="xl" sx={{ mb: 2 }}>
-      <Box sx={{ width: "100%", mt: 2 }}>
-        <Box
-          sx={{
-            bgcolor: "background.paper",
-            borderRadius: 2,
-          }}
-        >
-          <AppBar position="static" sx={{ boxShadow: 0 }}>
-            <Tabs
-              value={tabPanelValue}
-              onChange={handleChangeTab}
-              indicatorColor="secondary"
-              textColor="inherit"
-              variant="fullWidth"
-              aria-label="full width tabs example"
-            >
-              <Tab label="Search" {...a11yProps(0)} />
-              <Tab label="Advanced research" {...a11yProps(1)} />
-            </Tabs>
-          </AppBar>
-          <SwipeableViews
-            axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-            index={tabPanelValue}
-            onChangeIndex={handleChangeTabIndex}
-          >
-            <TabPanel value={tabPanelValue} index={0} dir={theme.direction}>
-              <SimpleSearchForm
-                jobsData={jobsData}
-                handleSubmit={handleSubmit}
-                handleFieldsChanges={handleFieldsChanges}
-                what={what}
-                where={where}
-              />
-            </TabPanel>
+      <SearchSection
+        jobsData={jobsData}
+        handleSubmit={handleSubmit}
+        handleFieldsChanges={handleFieldsChanges}
+        country={country}
+        what={what}
+        where={where}
+        category={category}
+        mustToBeInclude={mustToBeInclude}
+        maxDaysOld={maxDaysOld}
+        sortBy={sortBy}
+        maxDistance={maxDistance}
+        tabPanelValue={tabPanelValue}
+        setTabPanelValue={setTabPanelValue}
+        handleChangeTab={handleChangeTab}
+        handleChangeTabIndex={handleChangeTabIndex}
+      />
 
-            <TabPanel value={tabPanelValue} index={1} dir={theme.direction}>
-              <AdvancedSearchForm
-                jobsData={jobsData}
-                handleSubmit={handleSubmit}
-                handleFieldsChanges={handleFieldsChanges}
-                country={country}
-                what={what}
-                where={where}
-                category={category}
-                mustToBeInclude={mustToBeInclude}
-                maxDaysOld={maxDaysOld}
-                sortBy={sortBy}
-                maxDistance={maxDistance}
-              />
-            </TabPanel>
-          </SwipeableViews>
-        </Box>
-      </Box>
       <Box
         sx={{
           width: "100%",

@@ -16,10 +16,13 @@ import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
 import CorporateFareRoundedIcon from "@mui/icons-material/CorporateFareRounded";
 import { useNavigate } from "react-router-dom";
 import { format, formatDistance, formatRelative, subDays } from "date-fns";
+import { useTheme } from "@emotion/react";
 
 export default function JobCard(props) {
   const { jobData, selectedJob } = props;
   const navigate = useNavigate();
+  const theme = useTheme();
+
   const selectedJobColor = () =>
     selectedJob === jobData.id ? "primary.main" : "inherit";
 
@@ -28,7 +31,7 @@ export default function JobCard(props) {
   });
 
   const handleCardClick = () => {
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= theme.breakpoints.values.md) {
       // change route only with screen size less than 768px "md"
       navigate(`/job-details/${jobData.id}`);
     }

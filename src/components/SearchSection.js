@@ -54,9 +54,10 @@ function a11yProps(index) {
 
 export default function SearchSection(props) {
   const theme = useTheme();
+
   const {
     jobsData,
-    handleSubmit,
+
     handleFieldsChanges,
     country,
     what,
@@ -67,9 +68,17 @@ export default function SearchSection(props) {
     sortBy,
     maxDistance,
     tabPanelValue,
+    setTabPanelValue,
     handleChangeTab,
     handleChangeTabIndex,
   } = props;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    jobsData.refetch();
+  };
+
+  console.log(props);
 
   return (
     <Box sx={{ width: "100%", mt: 2 }}>

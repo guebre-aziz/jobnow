@@ -1,27 +1,10 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Grid,
-  Button,
-  Typography,
-  Input,
-  InputBase,
-  Box,
-  Pagination,
-  FormControl,
-} from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import SwipeableViews from "react-swipeable-views";
 import { useTheme } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import { useQuery } from "react-query";
-import { fetchCategories, fetchJobs } from "../common/utils/asyncfuncs";
-import JobsListing from "./jobs-listing/JobsListing";
-import JobDetailsCard from "./JobDetailsCard";
-import Loading from "./Loading";
-import Error from "./Error";
-import LoadingButton from "@mui/lab/LoadingButton";
 import SimpleSearchForm from "./SimpleSearchForm";
 import AdvancedSearchForm from "./AdvancedSearchForm";
 
@@ -57,13 +40,13 @@ export default function SearchSection(props) {
 
   const {
     jobsData,
-
     handleFieldsChanges,
     country,
     what,
     where,
     category,
     mustToBeInclude,
+    whatExclude,
     maxDaysOld,
     sortBy,
     maxDistance,
@@ -77,8 +60,6 @@ export default function SearchSection(props) {
     e.preventDefault();
     jobsData.refetch();
   };
-
-  console.log(props);
 
   return (
     <Box sx={{ width: "100%", mt: 2 }}>
@@ -126,6 +107,7 @@ export default function SearchSection(props) {
               where={where}
               category={category}
               mustToBeInclude={mustToBeInclude}
+              whatExclude={whatExclude}
               maxDaysOld={maxDaysOld}
               sortBy={sortBy}
               maxDistance={maxDistance}

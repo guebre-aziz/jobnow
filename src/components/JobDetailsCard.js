@@ -1,23 +1,18 @@
 import React from "react";
 import {
-  Grid,
   Typography,
-  Skeleton,
-  Box,
-  Paper,
   Card,
   CardContent,
-  CardActionArea,
   Button,
   CardActions,
 } from "@mui/material";
-import { format, formatDistance, formatRelative, subDays } from "date-fns";
+import { formatDistance } from "date-fns";
 import { useTheme } from "@emotion/react";
+import client from "../common/utils/reactQueryClient";
 
 export default function JobDetailsCard(props) {
   const theme = useTheme();
   const jobData = props.selectedJobData;
-
   const dateDistance = formatDistance(new Date(jobData.created), new Date(), {
     addSuffix: true,
   });
@@ -27,7 +22,7 @@ export default function JobDetailsCard(props) {
   };
 
   return (
-    <Card sx={{ mt: 2, boxShadow: 0 }} onClick={() => console.log(jobData)}>
+    <Card sx={{ mt: 2, boxShadow: 0 }}>
       <CardContent>
         <Typography variant="h4" component="div">
           {jobData.title}

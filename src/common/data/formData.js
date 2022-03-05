@@ -18,9 +18,6 @@ export const countryData = [
 ];
 
 export const sortingData = [
-  { value: "", name: "none" },
-  { value: "default", name: "default" },
-  { value: "hybrid", name: "hybrid" },
   { value: "date", name: "date" },
   { value: "salary", name: "salary" },
   { value: "relevance", name: "relevance" },

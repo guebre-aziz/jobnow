@@ -29,15 +29,13 @@ import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
 import ReplayRoundedIcon from "@mui/icons-material/ReplayRounded";
 import CategoryRoundedIcon from "@mui/icons-material/CategoryRounded";
 import FilterListRoundedIcon from "@mui/icons-material/FilterListRounded";
+import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import {
   countryData,
   sortingData,
   maxDistanceData,
 } from "../common/data/formData";
 import LoadingButton from "@mui/lab/LoadingButton";
-
-const app_id = "8028b95d";
-const app_key = "e55f767e4b51e106e03219958f6ef82d";
 
 export default function AdvancedSearchForm(props) {
   const {
@@ -49,6 +47,7 @@ export default function AdvancedSearchForm(props) {
     where,
     category,
     mustToBeInclude,
+    whatExclude,
     maxDaysOld,
     sortBy,
     maxDistance,
@@ -60,14 +59,15 @@ export default function AdvancedSearchForm(props) {
       "categoryData",
       {
         country: country,
-        params: { app_id: app_id, app_key: app_key },
+        params: {
+          app_id: process.env.REACT_APP_APP_ID,
+          app_key: process.env.REACT_APP_APP_KEY,
+        },
       },
     ],
     ({ queryKey }) => fetchCategories(queryKey[1]),
     {
-      /* enabled: false, */
-      staleTime: 300000000,
-      retry: 1,
+      retry: 2,
     }
   );
   return (
@@ -89,8 +89,8 @@ export default function AdvancedSearchForm(props) {
           lg={4}
         >
           <TextField
-            id="countryFieldId"
-            name="countryFieldId"
+            id="country-field-id"
+            name="country-field-id"
             placeholder="Country"
             label="Country"
             variant="outlined"
@@ -123,7 +123,7 @@ export default function AdvancedSearchForm(props) {
           lg={4}
         >
           <TextField
-            id="whatFieldId"
+            id="what-field-id"
             placeholder="e.g. Fullstack developer"
             label="Job title"
             variant="outlined"
@@ -149,8 +149,8 @@ export default function AdvancedSearchForm(props) {
           lg={4}
         >
           <TextField
-            id="categoryFieldId"
-            name="categoryFieldId"
+            id="category-field-id"
+            name="category-field-id"
             placeholder="Category"
             label="Category"
             variant="outlined"
@@ -187,7 +187,7 @@ export default function AdvancedSearchForm(props) {
           lg={4}
         >
           <TextField
-            id="whereFieldId"
+            id="where-field-id"
             placeholder="city, region, postal code ect.."
             label="Where"
             variant="outlined"
@@ -213,7 +213,7 @@ export default function AdvancedSearchForm(props) {
           lg={4}
         >
           <TextField
-            id="mustToBeIncludeFieldId"
+            id="must-to-be-include-field-id"
             placeholder="e.g. Start-up, React"
             label="Must include"
             variant="outlined"
@@ -225,6 +225,33 @@ export default function AdvancedSearchForm(props) {
               startAdornment: (
                 <InputAdornment position="start">
                   <VisibilityRoundedIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+
+        <Grid
+          component="form"
+          onSubmit={handleSubmit}
+          item
+          xs={12}
+          md={6}
+          lg={4}
+        >
+          <TextField
+            id="what-exclude-field-id"
+            placeholder="Keywords to exclude"
+            label="What exclude"
+            variant="outlined"
+            size="small"
+            value={whatExclude}
+            onChange={handleFieldsChanges}
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <ClearRoundedIcon />
                 </InputAdornment>
               ),
             }}
@@ -267,8 +294,8 @@ export default function AdvancedSearchForm(props) {
           lg={4}
         >
           <TextField
-            id="sortFieldId"
-            name="sortFieldId"
+            id="sort-field-id"
+            name="sort-field-id"
             placeholder=""
             label="Sort by"
             variant="outlined"
@@ -301,7 +328,7 @@ export default function AdvancedSearchForm(props) {
           >
             <Typography variant="caption">Max distance</Typography>
             <Slider
-              name="maxDistance"
+              name="max-distance-field-id"
               aria-label="Max distance"
               valueLabelDisplay="auto"
               value={maxDistance}

@@ -1,5 +1,4 @@
 import React from "react";
-
 import JobCard from "./JobCard";
 
 export default function JobsListing(props) {

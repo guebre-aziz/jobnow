@@ -1,38 +1,23 @@
 import React from "react";
-import {
-  Grid,
-  Typography,
-  Skeleton,
-  Box,
-  Paper,
-  Card,
-  CardContent,
-  CardActionArea,
-  Button,
-  CardActions,
-} from "@mui/material";
-import { Link } from "react-router-dom";
-import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
-import CorporateFareRoundedIcon from "@mui/icons-material/CorporateFareRounded";
+import { Typography, Card, CardContent, CardActionArea } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { format, formatDistance, formatRelative, subDays } from "date-fns";
+import { formatDistance } from "date-fns";
 import { useTheme } from "@emotion/react";
 
 export default function JobCard(props) {
-  const { jobData, selectedJob } = props;
+  const { jobData, selectedJob, handleSelectedJob } = props;
   const navigate = useNavigate();
   const theme = useTheme();
-
   const selectedJobColor = () =>
     selectedJob === jobData.id ? "primary.main" : "inherit";
-
   const dateDistance = formatDistance(new Date(jobData.created), new Date(), {
     addSuffix: true,
   });
 
   const handleCardClick = () => {
+    sessionStorage.setItem("selectedJobId", jobData.id);
     if (window.innerWidth <= theme.breakpoints.values.md) {
-      // change route only with screen size less than 768px "md"
+      // change route only with screen size less than "md"
       navigate(`/job-details/${jobData.id}`);
     }
   };
@@ -42,14 +27,14 @@ export default function JobCard(props) {
       onClick={handleCardClick}
       variant="outlined"
       sx={{
-        mt: 2,
+        m: 1,
         mr: 2,
         boxShadow: 0,
         backgroundColor: `${selectedJobColor()}`,
       }}
     >
       <CardActionArea>
-        <CardContent onClick={() => props.handleSelectedJob(jobData.id)}>
+        <CardContent onClick={() => handleSelectedJob(jobData.id)}>
           <Typography variant="h6">{jobData.title}</Typography>
           <Typography variant="h6" color="text.secondary">
             {jobData.company.display_name}

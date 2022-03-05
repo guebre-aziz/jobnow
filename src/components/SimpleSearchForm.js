@@ -19,7 +19,7 @@ export default function SimpleSearchForm(props) {
     >
       <Grid component="form" onSubmit={handleSubmit} item xs={12} md={6} lg={4}>
         <TextField
-          id="whatFieldId"
+          id="what-field-id"
           placeholder="e.g. Fullstack developer"
           label="Job title"
           variant="outlined"
@@ -38,7 +38,7 @@ export default function SimpleSearchForm(props) {
       </Grid>
       <Grid component="form" onSubmit={handleSubmit} item xs={12} md={6} lg={4}>
         <TextField
-          id="whereFieldId"
+          id="where-field-id"
           placeholder="city, region, postal code ect.."
           label="Where"
           variant="outlined"

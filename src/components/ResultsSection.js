@@ -46,7 +46,6 @@ export default function ResultsSection(props) {
   return (
     <Box
       sx={{
-        width: "100%",
         bgcolor: "background.paper",
         mt: 4,
         p: 2,
@@ -60,6 +59,15 @@ export default function ResultsSection(props) {
             <Loading />
           </Grid>
         )}
+
+        {!jobsData.data && (
+          <Grid item xs={12}>
+            <Typography variant="h4" align="center">
+              Let's start a new research!
+            </Typography>
+          </Grid>
+        )}
+
         {jobsData.data && (
           <>
             <Grid item xs={12}>

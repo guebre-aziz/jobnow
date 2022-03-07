@@ -142,7 +142,6 @@ export default function SearchJobsPage() {
   // Pick last params from cache on mount
   useEffect(() => {
     const data = client.getQueriesData("jobsData");
-    console.log(data);
     const lastCacheItem = data.length - 1; // It may exist more than one "jobsData" cache.
     const cacheParams = data[lastCacheItem][0][1];
 
@@ -156,7 +155,6 @@ export default function SearchJobsPage() {
       setMustToBeInclude(cacheParams.params.what_and);
     if (cacheParams.params?.whatExclude)
       setWhatExclude(cacheParams.params.whatExclude);
-
     if (cacheParams.params?.max_days_old)
       setMaxDaysOld(cacheParams.params.max_days_old);
     if (cacheParams.params?.sort_by) setSort(cacheParams.params.sort_by);
@@ -165,11 +163,9 @@ export default function SearchJobsPage() {
   }, []);
 
   useEffect(() => {
-    const selectedJobId = sessionStorage.getItem("selectedJobId");
-    if (selectedJobId) {
-      setSelectedJobId(selectedJobId);
-    } else if (jobsData.data) {
-      setSelectedJobId(jobsData.data.results[0]?.id);
+    const sessionSelectedJobId = sessionStorage.getItem("selectedJobId"); // session storage set by JobCard component
+    if (sessionSelectedJobId) {
+      setSelectedJobId(sessionSelectedJobId);
     }
   }, []);
 

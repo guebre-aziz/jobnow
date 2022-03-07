@@ -52,7 +52,7 @@ export default function ResponsiveAppBar() {
     // lowlight appbar buttons when we move to "/"
     if (location.pathname === "/") {
       setTabValue(-1);
-    } else setTabValue(0); // TODO: temporary
+    }
   }, [location.pathname]);
 
   return (
@@ -102,6 +102,7 @@ export default function ResponsiveAppBar() {
             <Box sx={{ width: "100%" }}>
               <Tabs value={tabValue} onChange={handleTab} aria-label="nav tabs">
                 <LinkTab label="Search" href="/search-jobs" />
+                <LinkTab label="My list" href="/my-list" />
               </Tabs>
             </Box>
           </Box>

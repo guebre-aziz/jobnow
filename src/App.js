@@ -14,6 +14,7 @@ import { ThemeProvider } from "@mui/material";
 import theme from "./assets/styles/theme";
 import Footer from "./components/Footer";
 import client from "./common/utils/reactQueryClient";
+import MyListPage from "./pages/MyListPage";
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/home" element={<HomePage />} />
               <Route path="/search-jobs" element={<SearchJobsPage />} />
+              <Route path="/my-list" element={<MyListPage />} />
               <Route path="/job-details/:id" element={<JobDetailsPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>

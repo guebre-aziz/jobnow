@@ -1,7 +1,6 @@
 import adzunaApi from "../axios/adzunaApi";
 
 export const fetchJobs = async (queryKey) => {
-  console.log(queryKey);
   const res = await adzunaApi.get(
     `/jobs/${queryKey.country}/search/${queryKey.page}`,
     {
@@ -14,7 +13,6 @@ export const fetchJobs = async (queryKey) => {
 // fetch categories
 
 export const fetchCategories = async (queryKey) => {
-  console.log(queryKey);
   const res = await adzunaApi.get(`/jobs/${queryKey.country}/categories`, {
     params: queryKey.params,
   });

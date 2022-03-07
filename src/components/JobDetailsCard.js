@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import { formatDistance } from "date-fns";
 import { useTheme } from "@emotion/react";
-import client from "../common/utils/reactQueryClient";
 
 export default function JobDetailsCard(props) {
   const theme = useTheme();
@@ -19,6 +18,22 @@ export default function JobDetailsCard(props) {
 
   const handleBackButtonClick = () => {
     window.history.back();
+  };
+
+  const myList = localStorage.getItem("jobnow-my-list");
+  let myListObj;
+  const storageMngr = () => {
+    let data = { jobs: [] };
+    if (myList) {
+      data = JSON.parse(myList);
+    }
+    myListObj = data;
+  };
+
+  const handleAddButton = () => {
+    storageMngr();
+    myListObj.jobs.unshift(jobData);
+    localStorage.setItem("jobnow-my-list", `${JSON.stringify(myListObj)}`);
   };
 
   return (
@@ -58,6 +73,9 @@ export default function JobDetailsCard(props) {
           target="blank"
         >
           Learn More
+        </Button>
+        <Button variant="outlined" color="error" onClick={handleAddButton}>
+          Add to Mylist
         </Button>
       </CardActions>
     </Card>

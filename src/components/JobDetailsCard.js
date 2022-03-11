@@ -5,41 +5,45 @@ import {
   CardContent,
   Button,
   CardActions,
+  Box,
 } from "@mui/material";
 import { formatDistance } from "date-fns";
 import { useTheme } from "@emotion/react";
+import useMyListStore from "../common/customHook/useMyListStore";
+import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 
 export default function JobDetailsCard(props) {
   const theme = useTheme();
+  const { isJobOnMyList, addJobToMylist, removeJobFromMyList } =
+    useMyListStore();
   const jobData = props.selectedJobData;
   const dateDistance = formatDistance(new Date(jobData.created), new Date(), {
     addSuffix: true,
   });
 
+  const favorite = isJobOnMyList(jobData.id);
+
   const handleBackButtonClick = () => {
     window.history.back();
   };
 
-  const myList = localStorage.getItem("jobnow-my-list");
-  let myListObj;
-  const storageMngr = () => {
-    let data = { jobs: [] };
-    if (myList) {
-      data = JSON.parse(myList);
-    }
-    myListObj = data;
+  const handleAddButton = () => {
+    addJobToMylist(jobData);
   };
 
-  const handleAddButton = () => {
-    storageMngr();
-    myListObj.jobs.unshift(jobData);
-    localStorage.setItem("jobnow-my-list", `${JSON.stringify(myListObj)}`);
+  const handleRemoveButton = () => {
+    removeJobFromMyList(jobData.id);
   };
 
   return (
     <Card sx={{ mt: 2, boxShadow: 0 }}>
       <CardContent>
         <Typography variant="h4" component="div">
+          {favorite && (
+            <Box sx={{ pr: 1, display: "inline-block" }}>
+              <FavoriteRoundedIcon sx={{ color: "red" }} />
+            </Box>
+          )}
           {jobData.title}
         </Typography>
 
@@ -74,9 +78,15 @@ export default function JobDetailsCard(props) {
         >
           Learn More
         </Button>
-        <Button variant="outlined" color="error" onClick={handleAddButton}>
-          Add to Mylist
-        </Button>
+        {favorite ? (
+          <Button variant="outlined" color="error" onClick={handleRemoveButton}>
+            Remove from Mylist
+          </Button>
+        ) : (
+          <Button variant="contained" color="success" onClick={handleAddButton}>
+            Add to Mylist
+          </Button>
+        )}
       </CardActions>
     </Card>
   );

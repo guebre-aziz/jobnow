@@ -1,17 +1,5 @@
 import React from "react";
-import {
-  Grid,
-  Typography,
-  Skeleton,
-  Box,
-  Paper,
-  Card,
-  CardContent,
-  CardActionArea,
-  Button,
-  CardActions,
-  Stack,
-} from "@mui/material";
+import { Grid, Skeleton, Stack } from "@mui/material";
 
 export default function LoadingJobsData() {
   return (

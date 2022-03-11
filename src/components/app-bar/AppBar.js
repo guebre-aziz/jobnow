@@ -1,45 +1,31 @@
 import React, { useState, useEffect } from "react";
 import AppBar from "@mui/material/AppBar";
-import LogoIconMin from "../../assets/images/logo-icon-min.svg";
-
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
+import {
+  Toolbar,
+  IconButton,
+  Typography,
+  Menu,
+  Container,
+  MenuItem,
+  Tabs,
+} from "@mui/material/";
 import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import MenuItem from "@mui/material/MenuItem";
-import Tabs from "@mui/material/Tabs";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Divider } from "@mui/material";
+import { useNavigate, useLocation } from "react-router-dom";
 import LinkTab from "./LinkTab";
 import HomeButton from "./HomeButton";
 
-const pages = ["Home", "Search", "Profile"];
-const settings = ["Profile", "MyList", "Setting"];
-
 export default function ResponsiveAppBar() {
   const [anchorElNav, setAnchorElNav] = useState(0);
-  const [anchorElUser, setAnchorElUser] = useState(0);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(0);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(0);
   };
 
   const [tabValue, setTabValue] = useState(0);
@@ -53,6 +39,12 @@ export default function ResponsiveAppBar() {
     if (location.pathname === "/") {
       setTabValue(-1);
     }
+    if (location.pathname === "/search-jobs") {
+      setTabValue(0);
+    }
+    if (location.pathname === "/my-list") {
+      setTabValue(1);
+    }
   }, [location.pathname]);
 
   return (
@@ -64,7 +56,7 @@ export default function ResponsiveAppBar() {
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
-              aria-label="account of current user"
+              aria-label="menu-appbar"
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
@@ -90,11 +82,20 @@ export default function ResponsiveAppBar() {
                 display: { xs: "block", md: "none" },
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
-                </MenuItem>
-              ))}
+              <MenuItem
+                key="search"
+                name="search"
+                onClick={() => navigate("/search-jobs")}
+              >
+                <Typography textAlign="center">Search</Typography>
+              </MenuItem>
+              <MenuItem
+                key="mylist"
+                name="mylist"
+                onClick={() => navigate("/my-list")}
+              >
+                <Typography textAlign="center">Mylist</Typography>
+              </MenuItem>
             </Menu>
           </Box>
 
@@ -105,35 +106,6 @@ export default function ResponsiveAppBar() {
                 <LinkTab label="My list" href="/my-list" />
               </Tabs>
             </Box>
-          </Box>
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
           </Box>
         </Toolbar>
       </Container>

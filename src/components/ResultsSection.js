@@ -4,6 +4,7 @@ import { useTheme } from "@mui/material/styles";
 import JobsListing from "./jobs-listing/JobsListing";
 import JobDetailsCard from "./JobDetailsCard";
 import Loading from "./Loading";
+import Error from "./Error";
 
 export default function ResultsSection(props) {
   const {
@@ -60,7 +61,7 @@ export default function ResultsSection(props) {
           </Grid>
         )}
 
-        {!jobsData.data && (
+        {!jobsData.data && !jobsData.isLoading && !jobsData.isError && (
           <Grid item xs={12}>
             <Typography variant="h4" align="center">
               Let's start a new research!
@@ -114,6 +115,8 @@ export default function ResultsSection(props) {
             </Grid>
           </>
         )}
+
+        {jobsData.isError && <Error error={jobsData.error} />}
       </Grid>
     </Box>
   );

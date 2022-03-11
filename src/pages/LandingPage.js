@@ -5,7 +5,7 @@ import styled from "@emotion/styled";
 import { InputBase } from "@mui/material";
 import { alpha } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import LogoIcon from "../../assets/images/logo-icon.svg";
+import LogoIcon from "../assets/images/logo-icon.svg";
 import { useNavigate } from "react-router-dom";
 
 export default function LandingPage() {

@@ -1,5 +1,10 @@
 import React from "react";
+import { Typography } from "@mui/material";
 
 export default function Error(props) {
-  return <h6>Error: {props.error.message}</h6>;
+  return (
+    <Typography variant="h6" color="error" sx={{ p: 2 }}>
+      Error: {props.error.message}
+    </Typography>
+  );
 }

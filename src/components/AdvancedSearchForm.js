@@ -1,29 +1,19 @@
 import React from "react";
 import {
-  Container,
   Grid,
-  Button,
   Typography,
-  Input,
-  InputBase,
   Box,
-  Divider,
   TextField,
   InputAdornment,
   MenuItem,
-  Paper,
   Slider,
-  Pagination,
-  FormControl,
 } from "@mui/material";
 
-import { fetchCategories, fetchJobs } from "../common/utils/asyncfuncs";
+import { fetchCategories } from "../common/utils/asyncfuncs";
 import { useQuery } from "react-query";
 import WorkRoundedIcon from "@mui/icons-material/WorkRounded";
 import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
-
 import PublicRoundedIcon from "@mui/icons-material/PublicRounded";
-import BusinessRoundedIcon from "@mui/icons-material/BusinessRounded";
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
 import ReplayRoundedIcon from "@mui/icons-material/ReplayRounded";

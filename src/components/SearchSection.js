@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Typography, Box } from "@mui/material";
 import SwipeableViews from "react-swipeable-views";
 import { useTheme } from "@mui/material/styles";

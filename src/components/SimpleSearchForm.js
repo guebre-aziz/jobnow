@@ -1,9 +1,8 @@
 import React from "react";
-import { Container, Grid, TextField, InputAdornment } from "@mui/material";
+import { Grid, TextField, InputAdornment } from "@mui/material";
 import WorkRoundedIcon from "@mui/icons-material/WorkRounded";
 import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
 import SearchIcon from "@mui/icons-material/Search";
-
 import LoadingButton from "@mui/lab/LoadingButton";
 
 export default function SimpleSearchForm(props) {

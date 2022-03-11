@@ -1,5 +1,4 @@
 import React from "react";
-// MUI
 import { Box, Container, IconButton, Typography, Divider } from "@mui/material";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import GitHubIcon from "@mui/icons-material/GitHub";

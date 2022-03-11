@@ -1,12 +1,24 @@
 import React, { useEffect } from "react";
-import JobCard from "../components/jobs-listing/JobCard";
+import FavoriteJobCard from "../components/FavoriteJobCard";
 import { Grid, Typography, Box, Pagination, Container } from "@mui/material";
+import useMyListStore from "../common/customHook/useMyListStore";
 
 export default function MyListPage() {
-  let myList = JSON.parse(localStorage.getItem("jobnow-my-list"))?.jobs;
+  const { myListData, removeJobFromMyList } = useMyListStore();
 
   return (
     <Container maxWidth="xl" sx={{ mb: 2 }}>
+      <Typography
+        component={"div"}
+        variant="h5"
+        align="center"
+        sx={{ backgroundColor: "primary.main", p: 2, borderRadius: 2 }}
+      >
+        MY FAVORITES JOBS LIST
+        <Typography color={"dark_grey.main"}>
+          (Data saved in your browser local storage)
+        </Typography>
+      </Typography>
       <Box
         sx={{
           bgcolor: "background.paper",
@@ -16,15 +28,24 @@ export default function MyListPage() {
           minHeight: "90vh",
         }}
       >
-        {myList ? (
-          myList.map((job) => {
-            return <JobCard jobData={job} />;
-          })
-        ) : (
-          <Typography variant="h4" align="center">
-            No item yet on your list
-          </Typography>
-        )}
+        <Grid container>
+          {myListData.length ? (
+            myListData.map((job) => {
+              return (
+                <Grid key={job.id} item xs={12} md={4}>
+                  <FavoriteJobCard
+                    jobData={job}
+                    removeJobFromMyList={removeJobFromMyList}
+                  />
+                </Grid>
+              );
+            })
+          ) : (
+            <Typography variant="h4" align="center">
+              No item yet on your list
+            </Typography>
+          )}
+        </Grid>
       </Box>
     </Container>
   );

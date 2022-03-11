@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Container, useForkRef } from "@mui/material";
 import { useQuery } from "react-query";
-import { fetchJobs } from "../../common/utils/asyncfuncs";
-import client from "../../common/utils/reactQueryClient";
-import Error from "../../components/Error";
-import SearchSection from "../../components/SearchSection";
-import ResultsSection from "../../components/ResultsSection";
-import { maxDistanceData } from "../../common/data/formData";
+import { fetchJobs } from "../common/utils/asyncfuncs";
+import client from "../common/utils/reactQueryClient";
+import Error from "../components/Error";
+import SearchSection from "../components/SearchSection";
+import ResultsSection from "../components/ResultsSection";
+import { maxDistanceData } from "../common/data/formData";
 
 export default function SearchJobsPage() {
   const [country, setCountry] = useState("it");
@@ -198,7 +198,6 @@ export default function SearchJobsPage() {
         page={page}
         setPage={setPage}
       />
-      {jobsData.isError && <Error error={jobsData.error} />}
     </Container>
   );
 }

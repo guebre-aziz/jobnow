@@ -4,7 +4,6 @@ import "./App.css";
 import { QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import LandingPage from "./pages/LandingPage";
-
 import SearchJobsPage from "./pages/SearchJobsPage";
 import JobDetailsPage from "./pages/JobDetailsPage";
 import NotFoundPage from "./pages/NotFoundFound";

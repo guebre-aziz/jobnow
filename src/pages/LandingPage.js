@@ -44,7 +44,7 @@ export default function LandingPage() {
           <img src={LogoIcon} alt="logo-icon" style={{ maxWidth: "100%" }} />
         </Grid>
         <Grid item sx={{ m: 10 }}>
-          <Typography variant="h5" color="white">
+          <Typography variant="h4" color="white">
             Search and find open jobs positions, everywhere.
           </Typography>
         </Grid>

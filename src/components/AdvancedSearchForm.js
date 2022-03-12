@@ -8,7 +8,6 @@ import {
   MenuItem,
   Slider,
 } from "@mui/material";
-
 import { fetchCategories } from "../common/utils/asyncfuncs";
 import { useQuery } from "react-query";
 import WorkRoundedIcon from "@mui/icons-material/WorkRounded";
@@ -20,12 +19,12 @@ import ReplayRoundedIcon from "@mui/icons-material/ReplayRounded";
 import CategoryRoundedIcon from "@mui/icons-material/CategoryRounded";
 import FilterListRoundedIcon from "@mui/icons-material/FilterListRounded";
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   countryData,
   sortingData,
   maxDistanceData,
 } from "../common/data/formData";
-import LoadingButton from "@mui/lab/LoadingButton";
 
 export default function AdvancedSearchForm(props) {
   const {
@@ -60,6 +59,7 @@ export default function AdvancedSearchForm(props) {
       retry: 2,
     }
   );
+
   return (
     <>
       <Grid

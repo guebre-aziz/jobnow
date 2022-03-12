@@ -51,7 +51,6 @@ export default function SearchSection(props) {
     sortBy,
     maxDistance,
     tabPanelValue,
-    setTabPanelValue,
     handleChangeTab,
     handleChangeTabIndex,
   } = props;
@@ -92,6 +91,7 @@ export default function SearchSection(props) {
               jobsData={jobsData}
               handleSubmit={handleSubmit}
               handleFieldsChanges={handleFieldsChanges}
+              country={country}
               what={what}
               where={where}
             />

@@ -1,5 +1,4 @@
 export const countryData = [
-  { IsoCode: "", name: "none" },
   { IsoCode: "gb", name: "United Kingdom" },
   { IsoCode: "at", name: "Austria" },
   { IsoCode: "au", name: "Australia" },

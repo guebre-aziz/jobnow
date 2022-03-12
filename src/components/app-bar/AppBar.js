@@ -51,7 +51,9 @@ export default function ResponsiveAppBar() {
     <AppBar position="static" color="light_grey" sx={{ boxShadow: 0 }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <HomeButton />
+          <Box sx={{ display: { xs: "none", md: "flex" } }}>
+            <HomeButton />
+          </Box>
 
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
@@ -107,6 +109,16 @@ export default function ResponsiveAppBar() {
               </Tabs>
             </Box>
           </Box>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}
+          >
+            <Box sx={{ display: { sx: "flex", md: "none" } }}>
+              <HomeButton />
+            </Box>
+          </Typography>
         </Toolbar>
       </Container>
     </AppBar>

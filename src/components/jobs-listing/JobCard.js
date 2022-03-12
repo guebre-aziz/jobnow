@@ -3,14 +3,9 @@ import { Typography, Card, CardContent, CardActionArea } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { formatDistance } from "date-fns";
 import { useTheme } from "@emotion/react";
-import useMyListStore from "../../common/customHook/useMyListStore";
-import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
-import { Box } from "@mui/material";
 
 export default function JobCard(props) {
   const { jobData, selectedJob, handleSelectedJob } = props;
-  const { isJobOnMyList } = useMyListStore();
-  const favorite = isJobOnMyList(jobData.id);
   const navigate = useNavigate();
   const theme = useTheme();
   const selectedJobColor = () =>
@@ -41,11 +36,6 @@ export default function JobCard(props) {
       <CardActionArea>
         <CardContent onClick={() => handleSelectedJob(jobData.id)}>
           <Typography variant="h6" component="div">
-            {favorite && (
-              <Box sx={{ pr: 1, display: "inline-block" }}>
-                <FavoriteRoundedIcon sx={{ color: "red" }} />
-              </Box>
-            )}
             {jobData.title}
           </Typography>
           <Typography variant="h6" color="text.secondary">

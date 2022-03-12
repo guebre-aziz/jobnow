@@ -1,12 +1,16 @@
 import React from "react";
-import { Grid, TextField, InputAdornment } from "@mui/material";
+import { Grid, TextField, InputAdornment, MenuItem } from "@mui/material";
 import WorkRoundedIcon from "@mui/icons-material/WorkRounded";
 import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
 import SearchIcon from "@mui/icons-material/Search";
 import LoadingButton from "@mui/lab/LoadingButton";
+import PublicRoundedIcon from "@mui/icons-material/PublicRounded";
+import { countryData } from "../common/data/formData";
 
 export default function SimpleSearchForm(props) {
-  const { jobsData, handleSubmit, handleFieldsChanges, what, where } = props;
+  const { jobsData, handleSubmit, handleFieldsChanges, country, what, where } =
+    props;
+
   return (
     <Grid
       container
@@ -16,6 +20,33 @@ export default function SimpleSearchForm(props) {
         p: 2,
       }}
     >
+      <Grid component="form" onSubmit={handleSubmit} item xs={12} md={6} lg={4}>
+        <TextField
+          id="country-field-id"
+          name="country-field-id"
+          placeholder="Country"
+          label="Country"
+          variant="outlined"
+          select
+          size="small"
+          value={country}
+          onChange={handleFieldsChanges}
+          fullWidth
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <PublicRoundedIcon />
+              </InputAdornment>
+            ),
+          }}
+        >
+          {countryData.map((country) => (
+            <MenuItem key={country.IsoCode} value={country.IsoCode} sx={{}}>
+              {country.name}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Grid>
       <Grid component="form" onSubmit={handleSubmit} item xs={12} md={6} lg={4}>
         <TextField
           id="what-field-id"

@@ -62,11 +62,17 @@ export default function JobDetailsCard(props) {
         <Typography variant="body1">{jobData.description}</Typography>
       </CardContent>
 
-      <CardActions sx={{ display: "flex", justifyContent: "space-around" }}>
+      <CardActions
+        sx={{
+          display: "flex",
+          justifyContent: "space-around",
+          flexWrap: "wrap",
+        }}
+      >
         <Button
           variant="outlined"
           onClick={handleBackButtonClick}
-          sx={{ [theme.breakpoints.up("md")]: { display: "none" } }}
+          sx={{ [theme.breakpoints.up("md")]: { display: "none" }, m: 2 }}
         >
           Back
         </Button>

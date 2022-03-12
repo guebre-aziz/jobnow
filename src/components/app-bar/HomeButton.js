@@ -22,7 +22,6 @@ export default function HomeButton() {
           maxHeight: "3rem",
           maxWidth: "3rem",
           mr: 2,
-          display: { xs: "none", md: "flex" },
         }}
       >
         <img src={LogoIconMin} alt="logo-image" style={{ maxWidth: "100%" }} />

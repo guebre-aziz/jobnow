@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
 
 export default function useMyListStore() {
-  const [isData, setIsData] = useState(null);
   const [myListData, setMyListData] = useState([]);
-  let data = localStorage.getItem("jobnow-my-list");
+  let ls = localStorage.getItem("jobnow-my-list");
 
+  // initialize
   useEffect(() => {
-    if (data) {
-      let dataObj = JSON.parse(data);
+    if (ls) {
+      let dataObj = JSON.parse(ls);
       if (dataObj.length) {
-        setIsData(true);
         setMyListData(dataObj);
       } else {
         localStorage.setItem("jobnow-my-list", JSON.stringify([]));
@@ -22,7 +21,7 @@ export default function useMyListStore() {
   }, []);
 
   function isJobOnMyList(id) {
-    if (isData) {
+    if (myListData) {
       if (myListData.map((item) => item.id).indexOf(id) >= 0) {
         return true;
       } else return false;
@@ -56,7 +55,6 @@ export default function useMyListStore() {
   }
 
   return {
-    isData,
     myListData,
     isJobOnMyList,
     addJobToMylist,

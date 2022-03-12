@@ -18,7 +18,7 @@ export default function Footer() {
           }}
         >
           <Typography variant="body2" color="primary" sx={{ pr: 2 }}>
-            guebre aziz
+            @ Guebre Aziz
           </Typography>
           <Divider orientation="vertical" flexItem />
 

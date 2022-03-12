@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Container, useForkRef } from "@mui/material";
+import { Container } from "@mui/material";
 import { useQuery } from "react-query";
 import { fetchJobs } from "../common/utils/asyncfuncs";
 import client from "../common/utils/reactQueryClient";
-import Error from "../components/Error";
 import SearchSection from "../components/SearchSection";
 import ResultsSection from "../components/ResultsSection";
 import { maxDistanceData } from "../common/data/formData";
